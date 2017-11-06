@@ -57,11 +57,11 @@ def GetStatsForTimer(J,name):
 
 
 class Job():
-	def __init__(self, domain_size=[32, 32, 32], cpus=[2, 2, 2], timesteps=1000):
+	def __init__(self, domain_size=[32, 32, 32], cpus=[2, 2, 2], timesteps=1000, output_suffix='out'):
 		self.domain_size = domain_size
 		self.cpus = cpus
 		self.timesteps = timesteps
-
+		self.output_suffix = output_suffix
 		self.job_name = "E.{0}.{1}.{2}.{3}.{4}.{5}.{6}".format(self.domain_size[0], self.domain_size[1], self.domain_size[2], self.cpus[0], self.cpus[1], self.cpus[2], self.timesteps)
 
 		self.total_cpu = numpy.prod(self.cpus)
@@ -69,34 +69,56 @@ class Job():
 		self.nodes = int(numpy.ceil(float(self.total_cpu)/float(self.ppn)))
 
 		self.submit_file = "{0}.submit.sh".format(self.job_name)
-		self.output_file = "{0}.out".format(self.job_name)
+		self.output_file = "{0}.{1}".format(self.job_name, self.output_suffix)
 
 		self.timers_results = dict()
 
-	def MakeSubmit(self):
-		with open(self.submit_file, 'w') as f:
-			f.write("")
+	def MakeSubmit(self, template):
+		F = dict()
+		F["executable"]		= "./dwarf"
+		F["nodes"] 			= self.nodes
+		F["ppn"] 			= self.ppn
+		F["job_name"] 		= self.job_name
+		F["total_cpu"]		= self.total_cpu
+		F["domain_size_x"]	= self.domain_size[0]
+		F["domain_size_y"]	= self.domain_size[1]
+		F["domain_size_z"]	= self.domain_size[2]
+		F["cpu_x"]			= self.cpus[0]
+		F["cpu_y"]			= self.cpus[1]
+		F["cpu_z"]			= self.cpus[2]
+		F["timesteps"]		= self.timesteps
+		F["output_suffix"]	= self.output_suffix
+		with open(self.submit_file, 'w') as sf:
+			with open(template, 'r') as tf:
+				for line in tf:
+					for key in F:
+						line = line.replace('{' + '{0}'.format(key) + '}', str(F[key]))
+						#print("{{0}}".format(key), str(F[key]))
+					sf.write(line)
 
-			f.write("#!/bin/bash\n")
-			f.write("#PBS -l nodes={0}:ppn={1}\n".format(self.nodes, self.ppn))
-			f.write("#PBS -l walltime=01:00:00\n")
-			f.write("##PBS -m abe\n")
-			f.write("#PBS -N {0}\n".format(self.job_name))
-			f.write("##PBS -j oe\n")
-			f.write("#PBS -q batch\n")
-			f.write("\n")
-			f.write("# Initialization\n")
-			f.write("set verbose\n")
-			f.write("set echo\n")
-			f.write("\n")
-			f.write("# Go into case directory\n")
-			f.write("cd $PBS_O_WORKDIR/\n")
-			f.write("\n")
-			f.write("# Run Eulag  in case directory\n")
-			f.write("mpirun -n {0} -f $PBS_NODEFILE 2>&1 >{1}.out ./dwarf --sizex {2} --sizey {3} --sizez {4} --nprocx {5} --nprocy {6} --nprocz {7} --maxiteration {8}\n".format(self.total_cpu, self.job_name, self.domain_size[0], self.domain_size[1], self.domain_size[2], self.cpus[0], self.cpus[1], self.cpus[2], self.timesteps))
+		# with open(self.submit_file, 'w') as f:
+		# 	f.write("")
+
+		# 	f.write("#!/bin/bash\n")
+		# 	f.write("#PBS -l nodes={0}:ppn={1}\n".format(self.nodes, self.ppn))
+		# 	f.write("#PBS -l walltime=01:00:00\n")
+		# 	f.write("##PBS -m abe\n")
+		# 	f.write("#PBS -N {0}\n".format(self.job_name))
+		# 	f.write("##PBS -j oe\n")
+		# 	f.write("#PBS -q batch\n")
+		# 	f.write("\n")
+		# 	f.write("# Initialization\n")
+		# 	f.write("set verbose\n")
+		# 	f.write("set echo\n")
+		# 	f.write("\n")
+		# 	f.write("# Go into case directory\n")
+		# 	f.write("cd $PBS_O_WORKDIR/\n")
+		# 	f.write("\n")
+		# 	f.write("# Run Eulag  in case directory\n")
+		# 	f.write("mpirun -n {0} -f $PBS_NODEFILE 2>&1 >{1}.out ./dwarf --sizex {2} --sizey {3} --sizez {4} --nprocx {5} --nprocy {6} --nprocz {7} --maxiteration {8}\n".format(self.total_cpu, self.job_name, self.domain_size[0], self.domain_size[1], self.domain_size[2], self.cpus[0], self.cpus[1], self.cpus[2], self.timesteps))
 
 
-		f.close()
+		# f.close()
 	def Submit(self):
 		run("qsub {0}".format(self.submit_file))
 
