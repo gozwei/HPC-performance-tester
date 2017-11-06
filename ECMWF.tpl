@@ -17,4 +17,4 @@ set echo
 cd $PBS_O_WORKDIR/
 pwd 
 # Run Eulag  in case directory
-aprun -n{total_cpu} -f $PBS_NODEFILE 2>&1 >{job_name}.{output_suffix} {executable} --sizex {domain_size_x} --sizey {domain_size_y} --sizez {domain_size_z} --nprocx {cpu_x} --nprocy {cpu_y} --nprocz {cpu_z} --maxiteration {timesteps}
+aprun -n{total_cpu} 2>&1 >{job_name}.{output_suffix} {executable} --sizex {domain_size_x} --sizey {domain_size_y} --sizez {domain_size_z} --nprocx {cpu_x} --nprocy {cpu_y} --nprocz {cpu_z} --maxiteration {timesteps}
