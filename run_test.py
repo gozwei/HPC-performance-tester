@@ -2,9 +2,9 @@ import numpy
 import subprocess
 import sys
 import os.path
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
+# import matplotlib as mpl
+# mpl.use('Agg')
+# import matplotlib.pyplot as plt
 from PerformanceTester import Tester
 
 

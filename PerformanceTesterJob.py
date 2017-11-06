@@ -13,23 +13,23 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def printc(msg, color='black', sep=' ', end='\n'):
-	if color == 'blue':
-		s = bcolors.BOLD + bcolors.OKBLUE
-		e = bcolors.ENDC
-	elif color == 'violet':
-		s = bcolors.BOLD + bcolors.HEADER
-		e = bcolors.ENDC
-	elif color == 'green':
-		s = bcolors.BOLD + bcolors.OKGREEN
-		e = bcolors.ENDC
-	elif color == 'red':
-		s = bcolors.BOLD + bcolors.FAIL
-		e = bcolors.ENDC
-	elif color == 'yellow':
-		s = bcolors.BOLD + bcolors.WARNING
-		e = bcolors.ENDC
-	print('{0}{1}{2}'.format(s,msg,e), sep=sep, end=end)
+# def printc(msg, color='black', sep=' ', end='\n'):
+# 	if color == 'blue':
+# 		s = bcolors.BOLD + bcolors.OKBLUE
+# 		e = bcolors.ENDC
+# 	elif color == 'violet':
+# 		s = bcolors.BOLD + bcolors.HEADER
+# 		e = bcolors.ENDC
+# 	elif color == 'green':
+# 		s = bcolors.BOLD + bcolors.OKGREEN
+# 		e = bcolors.ENDC
+# 	elif color == 'red':
+# 		s = bcolors.BOLD + bcolors.FAIL
+# 		e = bcolors.ENDC
+# 	elif color == 'yellow':
+# 		s = bcolors.BOLD + bcolors.WARNING
+# 		e = bcolors.ENDC
+# 	print('{0}{1}{2}'.format(s,msg,e), sep=sep, end=end)
 
 def run(cmd):
 	p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
