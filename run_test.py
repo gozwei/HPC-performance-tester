@@ -19,6 +19,7 @@ T.AddIterations(0,64,250)
 T.AddIterations(64,1800,1000)
 T.SetTemplate('GRAD.tpl')
 T.SetOutputSuffix("out")
+T.SetExecutable('./dwarf')
 T.GenerateJobs()
 
 if sys.argv[1] == "dryrun":

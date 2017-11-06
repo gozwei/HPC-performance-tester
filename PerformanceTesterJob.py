@@ -57,7 +57,7 @@ def GetStatsForTimer(J,name):
 
 
 class Job():
-	def __init__(self, domain_size=[32, 32, 32], cpus=[2, 2, 2], timesteps=1000, output_suffix='out'):
+	def __init__(self, domain_size=[32, 32, 32], cpus=[2, 2, 2], timesteps=1000, output_suffix='out', executable=''):
 		self.domain_size = domain_size
 		self.cpus = cpus
 		self.timesteps = timesteps
@@ -72,10 +72,11 @@ class Job():
 		self.output_file = "{0}.{1}".format(self.job_name, self.output_suffix)
 
 		self.timers_results = dict()
+		self.executable = executable
 
 	def MakeSubmit(self, template):
 		F = dict()
-		F["executable"]		= "./dwarf"
+		F["executable"]		= self.executable
 		F["nodes"] 			= self.nodes
 		F["ppn"] 			= self.ppn
 		F["job_name"] 		= self.job_name

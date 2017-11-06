@@ -28,6 +28,7 @@ class Tester():
 		self.template = ''
 		self.iterations = []
 		self.output_suffix = ''
+		self.executable = ''
 
 		self.uniq_total_cpus = []
 	def SetTimer(self, timer):
@@ -35,6 +36,9 @@ class Tester():
 
 	def SetTemplate(self, template):
 		self.template = template
+
+	def SetExecutable(self, executable):
+		self.executable = executable
 
 	def SetOutputSuffix(self, output_suffix):
 		self.output_suffix = output_suffix
@@ -62,7 +66,7 @@ class Tester():
 					for iteration in self.iterations:
 						if numpy.prod([x,y,z]) >= iteration[0] and numpy.prod([x,y,z]) <= iteration[1]:
 							for d in self.domains:
-								self.Jobs.append(Job(d, [x,y,z], iteration[2], output_suffix=self.output_suffix))
+								self.Jobs.append(Job(d, [x,y,z], iteration[2], output_suffix=self.output_suffix, executable=self.executable))
 					# if numpy.prod([x,y,z]) >= 64 and numpy.prod([x,y,z]) <= 1600:
 					# 	for d in self.domains:
 					# 		self.Jobs.append(Job(d, [x,y,z], 1000))
