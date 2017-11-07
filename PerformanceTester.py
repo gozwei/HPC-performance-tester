@@ -149,40 +149,45 @@ class Tester():
 			# plt.show()
 
 	def CpuConfigPlot(self):
-		JobsOK = []
-		for J in self.Jobs:
-			if J.domain_size == self.domains[0]:
-				if type(J.timers_results[self.timer]) is list:
-					JobsOK.append(J)
-		JobsOK.sort(key=lambda x: -float(x.timers_results[self.timer][4])/float(x.timers_results[self.timer][3]))
-		JobsOK.sort(key=lambda x: float(x.total_cpu))
-		y = []
-		labels=[]
-		y2 = []
-		tcp =  0
-		for J in JobsOK:
-			tpts = float(J.timers_results[self.timer][4])/float(J.timers_results[self.timer][3])
-			tptss = '{0:7.4f} s'.format(tpts)
-			print(numpy.prod(J.cpus), J.cpus[0], J.cpus[1], J.cpus[2],tptss)
-			y.append(tpts)
-			labels.append('{0} x {1} x {2}'.format(J.cpus[0],J.cpus[1],J.cpus[2]))
-			if tcp != J.total_cpu:
-				tcp = J.total_cpu
-				y2.append(len(y)-1)
-		x = range(len(y))
+		for ds in self.domains:
+			name = 'cpu_{0}_{1}_{2}.png'.format(ds[0], ds[1], ds[2])
+			title = 'Domian size {0} x {1} x {2}'.format(ds[0], ds[1], ds[2])
 
-		plt.clf()
-		fig = plt.figure(figsize=(50,15))
-		ax = fig.add_subplot(111)
-		#ax.set_xscale("log", nonposx='clip')
-		ax.set_yscale("log", nonposy='clip')
-		plt.plot(x,y,'.',ms=10)
-		for a in range(len(y2)):
-			plt.plot([y2[a]-.5, y2[a]-.5], [numpy.min(y), numpy.max(y)],'k--')
-		plt.xticks(x, labels, rotation='vertical')
-		plt.grid()
-		h = numpy.max(y)-numpy.min(y)
-		plt.axis([-.5, len(y)+.5, numpy.min(y)-h/20, numpy.max(y)+h/20])
-		plt.xlabel('Core configuration')
-		plt.ylabel('Average time per iteration')
-		plt.savefig("cpu.png")
+			JobsOK = []
+			for J in self.Jobs:
+				if J.domain_size == ds:
+					if type(J.timers_results[self.timer]) is list:
+						JobsOK.append(J)
+			JobsOK.sort(key=lambda x: -float(x.timers_results[self.timer][4])/float(x.timers_results[self.timer][3]))
+			JobsOK.sort(key=lambda x: float(x.total_cpu))
+			y = []
+			labels=[]
+			y2 = []
+			tcp =  0
+			for J in JobsOK:
+				tpts = float(J.timers_results[self.timer][4])/float(J.timers_results[self.timer][3])
+				tptss = '{0:7.4f} s'.format(tpts)
+				print(numpy.prod(J.cpus), J.cpus[0], J.cpus[1], J.cpus[2],tptss)
+				y.append(tpts)
+				labels.append('{0} x {1} x {2}'.format(J.cpus[0],J.cpus[1],J.cpus[2]))
+				if tcp != J.total_cpu:
+					tcp = J.total_cpu
+					y2.append(len(y)-1)
+			x = range(len(y))
+
+			plt.clf()
+			fig = plt.figure(figsize=(50,15))
+			ax = fig.add_subplot(111)
+			#ax.set_xscale("log", nonposx='clip')
+			ax.set_yscale("log", nonposy='clip')
+			plt.plot(x,y,'.',ms=10)
+			for a in range(len(y2)):
+				plt.plot([y2[a]-.5, y2[a]-.5], [numpy.min(y), numpy.max(y)],'k--')
+			plt.xticks(x, labels, rotation='vertical')
+			plt.grid()
+			h = numpy.max(y)-numpy.min(y)
+			plt.axis([-.5, len(y)+.5, numpy.min(y)-h/20, numpy.max(y)+h/20])
+			plt.xlabel('Core configuration')
+			plt.ylabel('Average time per iteration')
+			plt.title(title)
+			plt.savefig(name)
