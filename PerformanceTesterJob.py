@@ -13,7 +13,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def printc(msg, color='black', sep=' ', end='\n'):
+def printc(msg, color='black', end='\n'):
 	if color == 'blue':
 		s = bcolors.BOLD + bcolors.OKBLUE
 		e = bcolors.ENDC
@@ -29,7 +29,7 @@ def printc(msg, color='black', sep=' ', end='\n'):
 	elif color == 'yellow':
 		s = bcolors.BOLD + bcolors.WARNING
 		e = bcolors.ENDC
-	#print('{0}{1}{2}'.format(s,msg,e), sep=sep, end=end)
+	sys.stdout.write('{0}{1}{2}{3}'.format(s,msg,e,end))
 
 def run(cmd):
 	p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
