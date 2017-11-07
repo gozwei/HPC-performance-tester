@@ -32,5 +32,6 @@ if sys.argv[1] == "run":
 if sys.argv[1] == "test":
 	T.ReadJobTimers()
 	T.ProcessStats()
+	T.CpuConfigPlot()
 
 exit()
