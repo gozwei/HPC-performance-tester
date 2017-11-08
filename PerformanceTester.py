@@ -5,6 +5,7 @@ import os.path
 from PerformanceTesterJob import Job, printc
 import types
 from tabulate081 import tabulate
+from scipy import stats
 enable_plotting = True
 try:
 	import matplotlib as mpl
@@ -139,12 +140,36 @@ class Tester():
 			if enable_plotting:
 				plt.plot(self.uniq_total_cpus,min_times,self.domains_symbol[di], color=self.domains_color[di],label=str(self.domains[di]),ms=10)
 				plt.plot(self.uniq_total_cpus,min_times, color=self.domains_color[di])
+				Q, W = -1, -1
+				for q in range(len(self.uniq_total_cpus)):
+					if min_times[q] > 0:
+						for w in range(len(self.uniq_total_cpus)-1,0,-1):
+							if min_times[w] > 0:
+								if Q==-1 and W==-1:
+									Q = q
+									W = w
+									# print("Q, W", q, w)
+								
+				# print("Q, W", q, w)
+				# plt.plot([self.uniq_total_cpus[Q], self.uniq_total_cpus[W]], [min_times[Q], min_times[Q]/(self.uniq_total_cpus[W]/self.uniq_total_cpus[Q])],'--', color=self.domains_color[di])
+				print(self.uniq_total_cpus[Q:W])
+				print(min_times[Q:W])
+
+				x1, y1 = self.uniq_total_cpus[Q:W],min_times[Q:W]
+				x1 = numpy.log(numpy.array(x1))
+				y1 = numpy.log(numpy.array(y1))
+
+				slope, intercept, r_value, p_value, std_err = stats.linregress(x1,y1)		
+				print("LS", slope, intercept, r_value, p_value, std_err)
+				plt.plot([numpy.exp(x1[0]), numpy.exp(x1[-1])], [numpy.exp(x1[0]*slope+intercept), numpy.exp(x1[-1]*slope+intercept)],'-.', color=self.domains_color[di])
 			# print(self.uniq_total_cpus,min_times)
 		if enable_plotting:
 			print("MakingPlot")
+
 			plt.xlabel('Total number of cores')
 			plt.ylabel('Average time per iteration')
 			plt.legend()
+			plt.grid()
 			plt.savefig("nowy.png")
 			# plt.show()
 
@@ -163,17 +188,23 @@ class Tester():
 			y = []
 			labels=[]
 			y2 = []
+			x2=[]
 			tcp =  0
 			for J in JobsOK:
 				tpts = float(J.timers_results[self.timer][4])/float(J.timers_results[self.timer][3])
 				tptss = '{0:7.4f} s'.format(tpts)
+				tptspc = tpts*J.total_cpu
 				print(numpy.prod(J.cpus), J.cpus[0], J.cpus[1], J.cpus[2],tptss)
 				y.append(tpts)
 				labels.append('{0} x {1} x {2}'.format(J.cpus[0],J.cpus[1],J.cpus[2]))
 				if tcp != J.total_cpu:
 					tcp = J.total_cpu
 					y2.append(len(y)-1)
+					x2.append(tcp)
+
 			x = range(len(y))
+
+
 
 			plt.clf()
 			fig = plt.figure(figsize=(50,15))
@@ -181,6 +212,11 @@ class Tester():
 			#ax.set_xscale("log", nonposx='clip')
 			ax.set_yscale("log", nonposy='clip')
 			plt.plot(x,y,'.',ms=10)
+			for q in range(0,len(y2)-1):
+				s,e = y2[q], y2[q+1]
+				print("T", x2[q], s, e)
+				slope, intercept, r_value, p_value, std_err = stats.linregress(x[s:e],y[s:e])
+				print(slope, intercept, r_value, p_value, std_err)
 			for a in range(len(y2)):
 				plt.plot([y2[a]-.5, y2[a]-.5], [numpy.min(y), numpy.max(y)],'k--')
 			plt.xticks(x, labels, rotation='vertical')

@@ -1,6 +1,7 @@
 E.*
 *.zip
 *.png
+*.tgz
 
 
 # Byte-compiled / optimized / DLL files
