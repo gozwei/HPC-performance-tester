@@ -139,7 +139,7 @@ class Tester():
 					print('\t\t'+tabulate(T, headers=header, tablefmt="fancy_grid").replace('\n','\n\t\t'))
 			if enable_plotting:
 				plt.plot(self.uniq_total_cpus,min_times,self.domains_symbol[di], color=self.domains_color[di],label=str(self.domains[di]),ms=10)
-				plt.plot(self.uniq_total_cpus,min_times, color=self.domains_color[di])
+				#plt.plot(self.uniq_total_cpus,min_times, color=self.domains_color[di])
 				Q, W = -1, -1
 				for q in range(len(self.uniq_total_cpus)):
 					if min_times[q] > 0:
@@ -147,24 +147,25 @@ class Tester():
 							if min_times[w] > 0:
 								if Q==-1 and W==-1:
 									Q = q
-									W = w
+									W = w + 1
 									# print("Q, W", q, w)
 								
 				# print("Q, W", q, w)
 				# plt.plot([self.uniq_total_cpus[Q], self.uniq_total_cpus[W]], [min_times[Q], min_times[Q]/(self.uniq_total_cpus[W]/self.uniq_total_cpus[Q])],'--', color=self.domains_color[di])
-				print(self.uniq_total_cpus[Q:W])
-				print(min_times[Q:W])
+				# print(self.uniq_total_cpus[Q:W])
+				# print(min_times[Q:W])
 
 				x1, y1 = self.uniq_total_cpus[Q:W],min_times[Q:W]
-				x1 = numpy.log(numpy.array(x1))
-				y1 = numpy.log(numpy.array(y1))
+				x2 = numpy.log(numpy.array(x1))
+				y2 = numpy.log(numpy.array(y1))
 
-				slope, intercept, r_value, p_value, std_err = stats.linregress(x1,y1)		
-				print("LS", slope, intercept, r_value, p_value, std_err)
-				plt.plot([numpy.exp(x1[0]), numpy.exp(x1[-1])], [numpy.exp(x1[0]*slope+intercept), numpy.exp(x1[-1]*slope+intercept)],'-.', color=self.domains_color[di])
+				slope, intercept, r_value, p_value, std_err = stats.linregress(x2,y2)		
+				#print("LS", slope, intercept, r_value, p_value, std_err)
+				#plt.plot([x1[0], x1[-1]*16], [numpy.exp(x2[0]*slope+intercept), numpy.exp(numpy.log(x1[-1]*16)*slope+intercept)],'-.', color=self.domains_color[di])
+				plt.plot([1, 1024*32], [numpy.exp(numpy.log(1)*slope+intercept), numpy.exp(numpy.log(1024*32)*slope+intercept)],'-.', color=self.domains_color[di])
 			# print(self.uniq_total_cpus,min_times)
 		if enable_plotting:
-			print("MakingPlot")
+			# print("MakingPlot")
 
 			plt.xlabel('Total number of cores')
 			plt.ylabel('Average time per iteration')
@@ -184,17 +185,19 @@ class Tester():
 					if type(J.timers_results[self.timer]) is list:
 						JobsOK.append(J)
 			JobsOK.sort(key=lambda x: -float(x.timers_results[self.timer][4])/float(x.timers_results[self.timer][3]))
+			JobsOK.sort(key=lambda x: float(x.cpus[1]))
 			JobsOK.sort(key=lambda x: float(x.total_cpu))
 			y = []
 			labels=[]
 			y2 = []
 			x2=[]
 			tcp =  0
+			halo_size = []
 			for J in JobsOK:
 				tpts = float(J.timers_results[self.timer][4])/float(J.timers_results[self.timer][3])
 				tptss = '{0:7.4f} s'.format(tpts)
 				tptspc = tpts*J.total_cpu
-				print(numpy.prod(J.cpus), J.cpus[0], J.cpus[1], J.cpus[2],tptss)
+				#print(numpy.prod(J.cpus), J.cpus[0], J.cpus[1], J.cpus[2],tptss)
 				y.append(tpts)
 				labels.append('{0} x {1} x {2}'.format(J.cpus[0],J.cpus[1],J.cpus[2]))
 				if tcp != J.total_cpu:
@@ -202,21 +205,28 @@ class Tester():
 					y2.append(len(y)-1)
 					x2.append(tcp)
 
+				box = numpy.array(J.domain_size)/numpy.array(J.cpus)
+				pp = (box[0]*box[1]+box[1]*box[2]+box[0]*box[2])*2
+				ppt = pp*numpy.prod(J.cpus);
+				# print(J.domain_size, J.cpus, box, pp, ppt)
+				halo_size.append(ppt)
+
+			
 			x = range(len(y))
 
-
+			print("CORR:", stats.pearsonr(y, halo_size))
 
 			plt.clf()
 			fig = plt.figure(figsize=(50,15))
 			ax = fig.add_subplot(111)
 			#ax.set_xscale("log", nonposx='clip')
-			ax.set_yscale("log", nonposy='clip')
+			#ax.set_yscale("log", nonposy='clip')
 			plt.plot(x,y,'.',ms=10)
-			for q in range(0,len(y2)-1):
-				s,e = y2[q], y2[q+1]
-				print("T", x2[q], s, e)
-				slope, intercept, r_value, p_value, std_err = stats.linregress(x[s:e],y[s:e])
-				print(slope, intercept, r_value, p_value, std_err)
+			# for q in range(0,len(y2)-1):
+			# 	s,e = y2[q], y2[q+1]
+			# 	print("T", x2[q], s, e)
+			# 	slope, intercept, r_value, p_value, std_err = stats.linregress(x[s:e],y[s:e])
+			# 	print(slope, intercept, r_value, p_value, std_err)
 			for a in range(len(y2)):
 				plt.plot([y2[a]-.5, y2[a]-.5], [numpy.min(y), numpy.max(y)],'k--')
 			plt.xticks(x, labels, rotation='vertical')
@@ -225,5 +235,8 @@ class Tester():
 			plt.axis([-.5, len(y)+.5, numpy.min(y)-h/20, numpy.max(y)+h/20])
 			plt.xlabel('Core configuration')
 			plt.ylabel('Average time per iteration')
+			ax2 = plt.twinx()
+			#ax2.set_yscale("log", nonposy='clip')
+			ax2.plot(x,numpy.array(halo_size),'sr')
 			plt.title(title)
 			plt.savefig(name)
