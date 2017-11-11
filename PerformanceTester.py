@@ -69,8 +69,7 @@ class Tester():
 							for d in self.domains:
 								self.Jobs.append(Job(d, [x,y,z], iteration[2], output_suffix=self.output_suffix, executable=self.executable))
 					# if numpy.prod([x,y,z]) >= 64 and numpy.prod([x,y,z]) <= 1600:
-					# 	for d in self.domains:
-					# 		self.Jobs.append(Job(d, [x,y,z], 1000))
+
 					# elif numpy.prod([x,y,z]) < 64:
 					# 	for d in self.domains:
 					# 		self.Jobs.append(Job(d, [x,y,z], 250))
@@ -163,12 +162,13 @@ class Tester():
 				#print("LS", slope, intercept, r_value, p_value, std_err)
 				#plt.plot([x1[0], x1[-1]*16], [numpy.exp(x2[0]*slope+intercept), numpy.exp(numpy.log(x1[-1]*16)*slope+intercept)],'-.', color=self.domains_color[di])
 				plt.plot([1, 1024*32], [numpy.exp(numpy.log(1)*slope+intercept), numpy.exp(numpy.log(1024*32)*slope+intercept)],'-.', color=self.domains_color[di])
+				plt.axis((100,100000,0.0001,1))
 			# print(self.uniq_total_cpus,min_times)
 		if enable_plotting:
 			# print("MakingPlot")
 
-			plt.xlabel('Total number of cores')
-			plt.ylabel('Average time per iteration')
+			plt.xlabel('Total number of cores',fontsize=16)
+			plt.ylabel('Average time per iteration',fontsize=16)
 			plt.legend()
 			plt.grid()
 			plt.savefig("nowy.png")
@@ -177,7 +177,7 @@ class Tester():
 	def CpuConfigPlot(self):
 		for ds in self.domains:
 			name = 'cpu_{0}_{1}_{2}.png'.format(ds[0], ds[1], ds[2])
-			title = 'Domian size {0} x {1} x {2}'.format(ds[0], ds[1], ds[2])
+			title = 'Advection dwarf: global domain size {0} x {1} x {2}'.format(ds[0], ds[1], ds[2])
 
 			JobsOK = []
 			for J in self.Jobs:
@@ -185,7 +185,7 @@ class Tester():
 					if type(J.timers_results[self.timer]) is list:
 						JobsOK.append(J)
 			JobsOK.sort(key=lambda x: -float(x.timers_results[self.timer][4])/float(x.timers_results[self.timer][3]))
-			JobsOK.sort(key=lambda x: float(x.cpus[1]))
+			JobsOK.sort(key=lambda x: -float(x.cpus[2]))
 			JobsOK.sort(key=lambda x: float(x.total_cpu))
 			y = []
 			labels=[]
@@ -217,7 +217,7 @@ class Tester():
 			print("CORR:", stats.pearsonr(y, halo_size))
 
 			plt.clf()
-			fig = plt.figure(figsize=(50,15))
+			fig = plt.figure(figsize=(50,20))
 			ax = fig.add_subplot(111)
 			#ax.set_xscale("log", nonposx='clip')
 			#ax.set_yscale("log", nonposy='clip')
@@ -229,14 +229,15 @@ class Tester():
 			# 	print(slope, intercept, r_value, p_value, std_err)
 			for a in range(len(y2)):
 				plt.plot([y2[a]-.5, y2[a]-.5], [numpy.min(y), numpy.max(y)],'k--')
-			plt.xticks(x, labels, rotation='vertical')
+			plt.xticks(x, labels, rotation='vertical', fontsize=16)
 			plt.grid()
 			h = numpy.max(y)-numpy.min(y)
 			plt.axis([-.5, len(y)+.5, numpy.min(y)-h/20, numpy.max(y)+h/20])
-			plt.xlabel('Core configuration')
-			plt.ylabel('Average time per iteration')
+			plt.xlabel('MPI cartesian decomposition: nprocx * nprocy * nprocz', fontsize=28)
+			plt.ylabel('Average time per MPDATA call', fontsize=28)
+			plt.xticks(x, labels, rotation='vertical', fontsize=16)
 			ax2 = plt.twinx()
 			#ax2.set_yscale("log", nonposy='clip')
-			ax2.plot(x,numpy.array(halo_size),'sr')
-			plt.title(title)
+			#ax2.plot(x,numpy.array(halo_size),'sr')
+			plt.title(title, fontsize=28)
 			plt.savefig(name)
