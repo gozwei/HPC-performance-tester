@@ -188,6 +188,8 @@ class Tester():
 			JobsOK.sort(key=lambda x: -float(x.cpus[2]))
 			JobsOK.sort(key=lambda x: float(x.total_cpu))
 			y = []
+			bestx = []
+			besty = []
 			labels=[]
 			y2 = []
 			x2=[]
@@ -197,6 +199,21 @@ class Tester():
 				tpts = float(J.timers_results[self.timer][4])/float(J.timers_results[self.timer][3])
 				tptss = '{0:7.4f} s'.format(tpts)
 				tptspc = tpts*J.total_cpu
+
+				min_lptps = 1e10
+				for K in JobsOK:
+					
+					if J.total_cpu == K.total_cpu:
+						ltpts = float(K.timers_results[self.timer][4])/float(K.timers_results[self.timer][3])
+						if ltpts < min_lptps:
+							min_lptps = ltpts
+				print(J.total_cpu, min_lptps)
+				if tpts==min_lptps:
+					bestx.append(len(y))
+					besty.append(tpts)
+
+
+
 				#print(numpy.prod(J.cpus), J.cpus[0], J.cpus[1], J.cpus[2],tptss)
 				y.append(tpts)
 				labels.append('{0} x {1} x {2}'.format(J.cpus[0],J.cpus[1],J.cpus[2]))
@@ -211,6 +228,7 @@ class Tester():
 				# print(J.domain_size, J.cpus, box, pp, ppt)
 				halo_size.append(ppt)
 
+
 			
 			x = range(len(y))
 
@@ -221,7 +239,9 @@ class Tester():
 			ax = fig.add_subplot(111)
 			#ax.set_xscale("log", nonposx='clip')
 			#ax.set_yscale("log", nonposy='clip')
+			plt.plot(bestx,besty,'ro',ms=20)
 			plt.plot(x,y,'.',ms=10)
+			
 			# for q in range(0,len(y2)-1):
 			# 	s,e = y2[q], y2[q+1]
 			# 	print("T", x2[q], s, e)
