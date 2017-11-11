@@ -207,7 +207,7 @@ class Tester():
 						ltpts = float(K.timers_results[self.timer][4])/float(K.timers_results[self.timer][3])
 						if ltpts < min_lptps:
 							min_lptps = ltpts
-				print(J.total_cpu, min_lptps)
+				#print(J.total_cpu, min_lptps)
 				if tpts==min_lptps:
 					bestx.append(len(y))
 					besty.append(tpts)
@@ -247,16 +247,17 @@ class Tester():
 			# 	print("T", x2[q], s, e)
 			# 	slope, intercept, r_value, p_value, std_err = stats.linregress(x[s:e],y[s:e])
 			# 	print(slope, intercept, r_value, p_value, std_err)
+			h = numpy.max(y)-numpy.min(y)
 			for a in range(len(y2)):
-				plt.plot([y2[a]-.5, y2[a]-.5], [numpy.min(y), numpy.max(y)],'k--')
+				plt.plot([y2[a]-.5, y2[a]-.5], [numpy.min(y)-h/20, numpy.max(y)+h/20],'k--')
 			plt.xticks(x, labels, rotation='vertical', fontsize=16)
 			plt.grid()
-			h = numpy.max(y)-numpy.min(y)
-			plt.axis([-.5, len(y)+.5, numpy.min(y)-h/20, numpy.max(y)+h/20])
+			
+			plt.axis([-.5, len(y)-.5, numpy.min(y)-h/20, numpy.max(y)+h/20])
 			plt.xlabel('MPI cartesian decomposition: nprocx * nprocy * nprocz', fontsize=28)
 			plt.ylabel('Average time per MPDATA call', fontsize=28)
 			plt.xticks(x, labels, rotation='vertical', fontsize=16)
-			ax2 = plt.twinx()
+			#ax2 = plt.twinx()
 			#ax2.set_yscale("log", nonposy='clip')
 			#ax2.plot(x,numpy.array(halo_size),'sr')
 			plt.title(title, fontsize=28)
