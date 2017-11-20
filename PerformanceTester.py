@@ -5,11 +5,11 @@ import os.path
 from PerformanceTesterJob import Job, printc, run
 import types
 from tabulate081 import tabulate
-enable_scipy = False
+enable_scipy = True
 try:
 	from scipy import stats
-	enable_scipy = True
 except:
+	enable_scipy = False
 
 enable_plotting = True
 try:
