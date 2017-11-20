@@ -104,7 +104,7 @@ class Tester():
 				if J.total_cpu == tc:
 					if first:
 						J.MakeSubmit(self.template, part="all", mode="w", alternative_name="E.group_{0:05d}".format(tc))
-						self.group_submit_files.append("group_{0:05d}.submit.sh".format(tc))
+						self.group_submit_files.append("E.group_{0:05d}.submit.sh".format(tc))
 						first = False
 					else:
 						J.MakeSubmit(self.template, part="mpirun", mode="a", alternative_name="E.group_{0:05d}".format(tc))
