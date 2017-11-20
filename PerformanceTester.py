@@ -5,7 +5,12 @@ import os.path
 from PerformanceTesterJob import Job, printc, run
 import types
 from tabulate081 import tabulate
-from scipy import stats
+enable_scipy = False
+try:
+	from scipy import stats
+	enable_scipy = True
+except:
+
 enable_plotting = True
 try:
 	import matplotlib as mpl
@@ -184,11 +189,14 @@ class Tester():
 				x2 = numpy.log(numpy.array(x1))
 				y2 = numpy.log(numpy.array(y1))
 
-				slope, intercept, r_value, p_value, std_err = stats.linregress(x2,y2)		
-				#print("LS", slope, intercept, r_value, p_value, std_err)
-				#plt.plot([x1[0], x1[-1]*16], [numpy.exp(x2[0]*slope+intercept), numpy.exp(numpy.log(x1[-1]*16)*slope+intercept)],'-.', color=self.domains_color[di])
-				plt.plot([1, 1024*32], [numpy.exp(numpy.log(1)*slope+intercept), numpy.exp(numpy.log(1024*32)*slope+intercept)],'-.', color=self.domains_color[di])
-				plt.axis((100,100000,0.0001,1))
+				if enable_scipy:
+					slope, intercept, r_value, p_value, std_err = stats.linregress(x2,y2)		
+					#print("LS", slope, intercept, r_value, p_value, std_err)
+					#plt.plot([x1[0], x1[-1]*16], [numpy.exp(x2[0]*slope+intercept), numpy.exp(numpy.log(x1[-1]*16)*slope+intercept)],'-.', color=self.domains_color[di])
+					plt.plot([1, 1024*32], [numpy.exp(numpy.log(1)*slope+intercept), numpy.exp(numpy.log(1024*32)*slope+intercept)],'-.', color=self.domains_color[di])
+					plt.axis((100,100000,0.0001,1))
+				else:
+					print("No SCIPY!")
 			# print(self.uniq_total_cpus,min_times)
 		if enable_plotting:
 			# print("MakingPlot")
@@ -258,7 +266,10 @@ class Tester():
 			
 			x = range(len(y))
 
-			print("CORR:", stats.pearsonr(y, halo_size))
+			if enable_scipy:
+				print("CORR:", stats.pearsonr(y, halo_size))
+			else:
+				print("No SCIPY")
 
 			plt.clf()
 			fig = plt.figure(figsize=(50,20))
