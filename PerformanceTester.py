@@ -121,6 +121,32 @@ class Tester():
 	def ReadJobTimers(self):
 		for J in self.Jobs:
 			J.ReadTimer(self.timer)
+	
+	def ReadGroupJobTimers(self):
+		utc = set()
+		for J in self.Jobs:
+			utc.add(J.total_cpu)
+		utc = list(utc)
+		utc.sort()
+		print(utc)
+
+		for tc in utc:
+			outfile = "E.group_{0:05d}.{1}".format(tc, self.output_suffix)
+			run('cat {0}  | grep -E "^E\.|{1}" > {0}.clean'.format(outfile, self.timer))
+			with open("{0}.clean".format(outfile), 'r') as f:
+				fname = ''
+				for line in f:
+					#print(line.strip(),line[0:1] )
+					if line[0:2]=="E.":
+						fname = line.strip() + "."  + self.output_suffix
+					elif self.timer in line:
+						if len(fname) > 0:
+							with open(fname, "w") as fw:
+								fw.write(line)
+							fname=""
+		for J in self.Jobs:
+			J.ReadTimer(self.timer)
+
 
 	def ProcessStats(self):
 		if enable_plotting:
@@ -194,7 +220,7 @@ class Tester():
 					#print("LS", slope, intercept, r_value, p_value, std_err)
 					#plt.plot([x1[0], x1[-1]*16], [numpy.exp(x2[0]*slope+intercept), numpy.exp(numpy.log(x1[-1]*16)*slope+intercept)],'-.', color=self.domains_color[di])
 					plt.plot([1, 1024*32], [numpy.exp(numpy.log(1)*slope+intercept), numpy.exp(numpy.log(1024*32)*slope+intercept)],'-.', color=self.domains_color[di])
-					plt.axis((100,100000,0.0001,1))
+					plt.axis((1,100000,0.0001,1))
 				else:
 					print("No SCIPY!")
 			# print(self.uniq_total_cpus,min_times)
