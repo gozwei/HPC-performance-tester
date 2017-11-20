@@ -74,12 +74,12 @@ class Job():
 		self.timers_results = dict()
 		self.executable = executable
 
-	def MakeSubmit(self, template):
+	def MakeSubmit(self, template, part="all", mode="w", alternative_name=""):
 		F = dict()
 		F["executable"]		= self.executable
 		F["nodes"] 			= self.nodes
 		F["ppn"] 			= self.ppn
-		F["job_name"] 		= self.job_name
+		F["job_id"] 		= self.job_name
 		F["total_cpu"]		= self.total_cpu
 		F["domain_size_x"]	= self.domain_size[0]
 		F["domain_size_y"]	= self.domain_size[1]
@@ -89,13 +89,29 @@ class Job():
 		F["cpu_z"]			= self.cpus[2]
 		F["timesteps"]		= self.timesteps
 		F["output_suffix"]	= self.output_suffix
-		with open(self.submit_file, 'w') as sf:
+		enable = True
+		if part == "mpirun":
+			enable = False
+		if alternative_name == "":
+			submit_file = self.submit_file
+			F["job_name"] 		= self.job_name
+		else:
+			submit_file = alternative_name + ".submit.sh"
+			F["job_name"] 		= alternative_name
+
+		with open(submit_file, mode) as sf:
 			with open(template, 'r') as tf:
 				for line in tf:
-					for key in F:
-						line = line.replace('{' + '{0}'.format(key) + '}', str(F[key]))
-						#print("{{0}}".format(key), str(F[key]))
-					sf.write(line)
+					if line.strip() == "# RUN":
+						if part == "head":
+							enable = False
+						elif part == "mpirun":
+							enable = True
+					if enable:
+						for key in F:
+							line = line.replace('{' + '{0}'.format(key) + '}', str(F[key]))
+							#print("{{0}}".format(key), str(F[key]))
+						sf.write(line)
 
 		# with open(self.submit_file, 'w') as f:
 		# 	f.write("")

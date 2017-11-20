@@ -2,7 +2,7 @@ import numpy
 import subprocess
 import sys
 import os.path
-from PerformanceTesterJob import Job, printc
+from PerformanceTesterJob import Job, printc, run
 import types
 from tabulate081 import tabulate
 from scipy import stats
@@ -32,6 +32,8 @@ class Tester():
 		self.executable = ''
 
 		self.uniq_total_cpus = []
+
+		self.group_submit_files = []
 	def SetTimer(self, timer):
 		self.timer = timer
 
@@ -83,9 +85,33 @@ class Tester():
 			J.MakeSubmit(self.template)
 			print('Prepared submit for job', J.job_name)
 
+	def MakeGroupSubmits(self):
+		utc = set()
+		for J in self.Jobs:
+			utc.add(J.total_cpu)
+		utc = list(utc)
+		utc.sort()
+		print(utc)
+
+		for tc in utc:
+			first = True
+			for J in self.Jobs:
+				if J.total_cpu == tc:
+					if first:
+						J.MakeSubmit(self.template, part="all", mode="w", alternative_name="E.group_{0:05d}".format(tc))
+						self.group_submit_files.append("group_{0:05d}.submit.sh".format(tc))
+						first = False
+					else:
+						J.MakeSubmit(self.template, part="mpirun", mode="a", alternative_name="E.group_{0:05d}".format(tc))
+
+
 	def SubmitAll(self):
 		for J in self.Jobs:
 			J.Submit()
+
+	def SubmitGroupAll(self):
+		for f in self.group_submit_files:
+			run("qsub {0}".format(f))
 
 	def ReadJobTimers(self):
 		for J in self.Jobs:
