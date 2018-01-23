@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -l nodes={nodes}:ppn={ppn}
-#PBS -l walltime=01:00:00
+#PBS -l walltime=05:00:00
 ##PBS -m abe
 #PBS -N {job_name}
 ##PBS -j oe

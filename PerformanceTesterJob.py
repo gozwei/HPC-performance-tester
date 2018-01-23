@@ -14,6 +14,8 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 def printc(msg, color='black', end='\n'):
+	s = ''
+	e = ''
 	if color == 'blue':
 		s = bcolors.BOLD + bcolors.OKBLUE
 		e = bcolors.ENDC
@@ -31,11 +33,12 @@ def printc(msg, color='black', end='\n'):
 		e = bcolors.ENDC
 	sys.stdout.write('{0}{1}{2}{3}'.format(s,msg,e,end))
 
-def run(cmd):
+def run(cmd, quiet=False):
 	p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 	out, err = p.communicate()
-	print(out.decode("utf-8").replace("\\n", "\n").strip())
-	print(err.decode("utf-8").replace("\\n", "\n").strip())
+	if not quiet:
+		print(out.decode("utf-8").replace("\\n", "\n").strip())
+		print(err.decode("utf-8").replace("\\n", "\n").strip())
 	return (out, err)
 
 def RemoveMultipleSpaces(str):
@@ -57,12 +60,12 @@ def GetStatsForTimer(J,name):
 
 
 class Job():
-	def __init__(self, domain_size=[32, 32, 32], cpus=[2, 2, 2], timesteps=1000, output_suffix='out', executable=''):
+	def __init__(self, domain_size=[32, 32, 32], cpus=[2, 2, 2], timesteps=1000, output_suffix='out', executable='', job_exec=''):
 		self.domain_size = domain_size
 		self.cpus = cpus
 		self.timesteps = timesteps
 		self.output_suffix = output_suffix
-		self.job_name = "E.{0}.{1}.{2}.{3}.{4}.{5}.{6}".format(self.domain_size[0], self.domain_size[1], self.domain_size[2], self.cpus[0], self.cpus[1], self.cpus[2], self.timesteps)
+		self.job_name = "E.{0}.{1}.{2}.{3}.{4}.{5}.{6}.{7}".format(job_exec, self.domain_size[0], self.domain_size[1], self.domain_size[2], self.cpus[0], self.cpus[1], self.cpus[2], self.timesteps)
 
 		self.total_cpu = numpy.prod(self.cpus)
 		self.ppn = 20
