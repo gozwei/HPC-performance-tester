@@ -19,6 +19,13 @@ try:
 except:
 	enable_plotting = False
 
+def divisors(n):
+	result = []
+	for i in range(1,n+1):
+		if n%i==0:
+			result.append(i)
+	return result
+
 
 class Tester():
 	def __init__(self):
@@ -89,6 +96,28 @@ class Tester():
 		self.Jobs.sort()
 		self.uniq_total_cpus = list(utc)
 		self.uniq_total_cpus.sort()
+
+	def GenerateJobsTotalCPU(self, totalCPU):
+		utc = set()
+		cpu_configs = []
+		totalCPU_divisors = divisors(totalCPU)
+		for exec in self.executable:
+			for x in totalCPU_divisors:
+				for y in totalCPU_divisors:
+					for z in totalCPU_divisors: 
+						code = "{0}_{1}_{2}".format(x,y,z)
+						if numpy.prod([x,y,z]) == totalCPU:
+							if code not in cpu_configs:
+								cpu_configs.append(code)
+								utc.add(numpy.prod([x,y,z]))
+								for iteration in self.iterations:
+									if numpy.prod([x,y,z]) > iteration[0] and numpy.prod([x,y,z]) <= iteration[1]:
+										for d in self.domains:
+											self.Jobs.append(Job(d, [x,y,z], iteration[2], output_suffix=self.output_suffix, executable=exec, job_exec=exec.replace("./","").replace(".out","")))
+		self.Jobs.sort()
+		self.uniq_total_cpus = list(utc)
+		self.uniq_total_cpus.sort()
+
 
 	def MakeSubmits(self):
 		for J in self.Jobs:
