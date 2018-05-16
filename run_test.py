@@ -28,7 +28,7 @@ T.AddExecutable('./test_003.out', 'test_003', symbol='*')
 #T.GenerateJobs()
 
 
-T.GenerateJobsTotalCPU(20)
+T.GenerateJobsTotalCPU(20,10,10,2)
 
 
 

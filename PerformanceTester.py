@@ -97,7 +97,7 @@ class Tester():
 		self.uniq_total_cpus = list(utc)
 		self.uniq_total_cpus.sort()
 
-	def GenerateJobsTotalCPU(self, totalCPU):
+	def GenerateJobsTotalCPU(self, totalCPU, max_x=2**10, max_y=2**10, max_z=2**10):
 		utc = set()
 		cpu_configs = []
 		totalCPU_divisors = divisors(totalCPU)
@@ -107,13 +107,14 @@ class Tester():
 					for z in totalCPU_divisors: 
 						code = "{0}_{1}_{2}".format(x,y,z)
 						if numpy.prod([x,y,z]) == totalCPU:
-							if code not in cpu_configs:
-								cpu_configs.append(code)
-								utc.add(numpy.prod([x,y,z]))
-								for iteration in self.iterations:
-									if numpy.prod([x,y,z]) > iteration[0] and numpy.prod([x,y,z]) <= iteration[1]:
-										for d in self.domains:
-											self.Jobs.append(Job(d, [x,y,z], iteration[2], output_suffix=self.output_suffix, executable=exec, job_exec=exec.replace("./","").replace(".out","")))
+							if x <= max_x and y <= max_y and z <= max_z:
+								if code not in cpu_configs:
+									cpu_configs.append(code)
+									utc.add(numpy.prod([x,y,z]))
+									for iteration in self.iterations:
+										if numpy.prod([x,y,z]) > iteration[0] and numpy.prod([x,y,z]) <= iteration[1]:
+											for d in self.domains:
+												self.Jobs.append(Job(d, [x,y,z], iteration[2], output_suffix=self.output_suffix, executable=exec, job_exec=exec.replace("./","").replace(".out","")))
 		self.Jobs.sort()
 		self.uniq_total_cpus = list(utc)
 		self.uniq_total_cpus.sort()
