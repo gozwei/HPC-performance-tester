@@ -151,7 +151,7 @@ class Tester():
 
 	def SubmitGroupAll(self):
 		for f in self.group_submit_files:
-			run("qsub {0}".format(f))
+			run("sbatch {0}".format(f))
 
 	def ReadJobTimers(self):
 		for J in self.Jobs:
@@ -203,8 +203,8 @@ class Tester():
 		if enable_plotting:
 			fig = plt.figure(figsize=[16,8])
 			ax = fig.add_subplot(111)
-			ax.set_xscale("log", nonposx='clip')
-			ax.set_yscale("log", nonposy='clip')
+			ax.set_xscale("log", nonpositive='clip')
+			ax.set_yscale("log", nonpositive='clip')
 		for iexec in range(len(self.executable)):
 			exec = self.executable[iexec]
 			execn= self.executable_name[iexec]
@@ -250,6 +250,7 @@ class Tester():
 				if enable_plotting:
 					Q, W = -1, -1
 					for q in range(len(self.uniq_total_cpus)):
+						print (len(self.uniq_total_cpus))
 						if min_times[q] > 0:
 							for w in range(len(self.uniq_total_cpus)-1,0,-1):
 								if min_times[w] > 0:
@@ -260,6 +261,7 @@ class Tester():
 					x1, y1 = self.uniq_total_cpus[Q:W],min_times[Q:W]
 					x2 = numpy.log(numpy.array(x1))
 					y2 = numpy.log(numpy.array(y1))
+					print (x1,y1)
 					if enable_scipy:
 						slope, intercept, r_value, p_value, std_err = stats.linregress(x2,y2)		
 						#print("LS", slope, intercept, r_value, p_value, std_err)
@@ -267,7 +269,7 @@ class Tester():
 						plt.plot([1, 1024*32], [numpy.exp(numpy.log(1)*slope+intercept), numpy.exp(numpy.log(1024*32)*slope+intercept)],'-.', color=self.domains_color[di])
 					else:
 						print("No SCIPY!")
-					plt.plot(self.uniq_total_cpus,min_times,self.executable_symbol[iexec], color=self.domains_color[di],label="{0}, {1} ({2:4.3f})".format(execn,self.domains[di],-slope),ms=10)
+					#plt.plot(self.uniq_total_cpus,min_times,self.executable_symbol[iexec], color=self.domains_color[di],label="{0}, {1} ({2:4.3f})".format(execn,self.domains[di],-slope),ms=10)
 					#plt.plot(self.uniq_total_cpus,min_times, color=self.domains_color[di])
 					
 									

@@ -68,7 +68,7 @@ class Job():
 		self.job_name = "E.{0}.{1}.{2}.{3}.{4}.{5}.{6}.{7}".format(job_exec, self.domain_size[0], self.domain_size[1], self.domain_size[2], self.cpus[0], self.cpus[1], self.cpus[2], self.timesteps)
 
 		self.total_cpu = numpy.prod(self.cpus)
-		self.ppn = 20
+		self.ppn = 128 
 		self.nodes = int(numpy.ceil(float(self.total_cpu)/float(self.ppn)))
 
 		self.submit_file = "{0}.submit.sh".format(self.job_name)
@@ -140,7 +140,7 @@ class Job():
 
 		# f.close()
 	def Submit(self):
-		run("qsub {0}".format(self.submit_file))
+		run("sbatch {0}".format(self.submit_file))
 
 	def ReadTimer(self, timer):
 		self.timers_results[timer] = 0
