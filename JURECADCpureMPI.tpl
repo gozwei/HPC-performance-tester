@@ -19,4 +19,4 @@ echo "START: {job_name}" > {job_name}.{output_suffix}
 # RUN
 echo "{job_id}" >> {job_name}.{output_suffix}
 read -s -t 2
-srun --hint=nomultithread --cpu-bind=rank -n {total_cpu} {executable} --sizex {domain_size_x} --sizey {domain_size_y} --sizez {domain_size_z} --nprocx {cpu_x} --nprocy {cpu_y} --nprocz {cpu_z} --maxiteration {timesteps}
+srun --hint=nomultithread  {executable} --sizex {domain_size_x} --sizey {domain_size_y} --sizez {domain_size_z} --nprocx {cpu_x} --nprocy {cpu_y} --nprocz {cpu_z} --maxiteration {timesteps}

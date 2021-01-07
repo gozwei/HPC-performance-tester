@@ -13,11 +13,11 @@ T = Tester()
 #T.SetTimer("diff_fckflxdv")
 T.SetTimer("timeloop")
 #T.AddDomain( 64, 64, 64, color='#800000')
-T.AddDomain( 256, 256, 128, color='#008000')
+T.AddDomain( 512,512, 128, color='#008000')
 
 T.AddIterations(0,1500,1)
 #T.AddIterations(64,1800,1000)
-T.SetTemplate('JURECADC.tpl')
+T.SetTemplate('JURECADChybrid.tpl')
 T.SetOutputSuffix("logout")
 T.AddExecutable('./comprconvecapp', 'comprconvecapp', symbol='o')
 #T.AddExecutable('./test_002.out', 'test_002', symbol='s')
@@ -25,7 +25,7 @@ T.AddExecutable('./comprconvecapp', 'comprconvecapp', symbol='o')
 
 
 #T.SetCpuConfig([2,4,8,16,32,64,128], [2,4,8,16,32,64], [1,2,4])
-T.SetCpuConfig([2,4,8], [2,4,8], [1,2])
+T.SetCpuConfig([4,8], [4,8], [1,2])
 T.GenerateJobs()
 
 

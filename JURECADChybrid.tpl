@@ -2,8 +2,8 @@
 #SBATCH --account=slmet
 #SBATCH --nodes={nodes}
 #SBATCH --ntasks={total_cpu}
-##SBATCH --ntasks-per-node={ppn}
-#SBATCH --cpus-per-task=2
+#SBATCH --ntasks-per-node=32
+#SBATCH --cpus-per-task=8
 #SBATCH --output={job_name}.{output_suffix}
 #SBATCH --error={job_name}.{output_suffix}
 #SBATCH --time=00:14:59
@@ -13,7 +13,7 @@
 
 UCX_LOG_LEVEL=error
 export UCX_LOG_LEVEL
-export OMP_NUM_THREADS=2
+export OMP_NUM_THREADS=8
 # Run Eulag  in case directory
 echo "START: {job_name}" > {job_name}.{output_suffix}
 # RUN
